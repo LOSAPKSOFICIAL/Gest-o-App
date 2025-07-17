@@ -1,35 +1,31 @@
-// -------- CONFIG --------
-const pontos = ['A', 'B', 'C', 'D'];
+const pontos = ['ESTOQUE A', 'ESTOQUE B', 'ESTOQUE C', 'ESTOQUE D'];
 const estoqueSection = document.getElementById('estoque');
-let categorias = []; // Será carregado do banco
-
-// -------- INTERFACE PRINCIPAL --------
+let categorias = [];
 estoqueSection.innerHTML = `
-  <h2>Cadastro de Estoque</h2>
-  <button id="novo-produto-btn">+ Novo Produto/Categoria</button>
+  <h2>📦 Cadastro de Estoque</h2>
+  <button id="novo-produto-btn" class="accent-btn">+ Novo Produto/Categoria</button>
   <div id="categorias-edicao"></div>
   <form id="form-estoque">
     <label>Data: <input type="date" id="estoque-data" required value="${formatDate(new Date())}"></label>
     <div id="produtos-estoque"></div>
     <button type="submit">Salvar Estoque</button>
   </form>
-  <div id="estoque-resumo"></div>
+  <div id="estoque-list" class="card-list"></div>
+  <canvas id="estoque-chart" height="120"></canvas>
 `;
 
-// -------- MODAL NOVA CATEGORIA --------
 function showNovoProdutoModal() {
   const modal = document.createElement('div');
-  modal.className = 'modal';
+  modal.className = 'login-modal-bg';
   modal.innerHTML = `
-    <div class="modal-content">
-      <h3>Novo Produto/Categoria</h3>
-      <input type="text" id="nova-categoria-nome" placeholder="Nome da categoria">
+    <form class="login-card" onsubmit="return false;">
+      <h3>Nova Categoria/Produto</h3>
+      <input type="text" id="nova-categoria-nome" placeholder="Nome da categoria" required>
       <button id="salvar-nova-categoria">Salvar</button>
-      <button id="cancelar-nova-categoria">Cancelar</button>
-    </div>
+      <button id="cancelar-nova-categoria" type="button" style="background:var(--danger);">Cancelar</button>
+    </form>
   `;
   document.body.appendChild(modal);
-
   document.getElementById('salvar-nova-categoria').onclick = async () => {
     const nome = document.getElementById('nova-categoria-nome').value.trim();
     if (nome && !categorias.some(c => c.nome === nome)) {
@@ -44,7 +40,6 @@ function showNovoProdutoModal() {
 }
 document.getElementById('novo-produto-btn').onclick = showNovoProdutoModal;
 
-// -------- EDITAR/REMOVER CATEGORIA --------
 async function renderCategoriasEdicao() {
   const div = document.getElementById('categorias-edicao');
   div.innerHTML = '<h4>Categorias/Produtos:</h4><ul>' +
@@ -54,7 +49,6 @@ async function renderCategoriasEdicao() {
         <button class="del-cat" data-idx="${idx}">🗑️</button>
       </li>
     `).join('') + '</ul>';
-  // Editar nome
   div.querySelectorAll('.edit-nome-cat').forEach(input => {
     input.onchange = async function() {
       const idx = +this.dataset.idx;
@@ -63,7 +57,6 @@ async function renderCategoriasEdicao() {
       await renderProdutosEstoque();
     };
   });
-  // Remover categoria
   div.querySelectorAll('.del-cat').forEach(btn => {
     btn.onclick = async function() {
       const idx = +this.dataset.idx;
@@ -75,7 +68,6 @@ async function renderCategoriasEdicao() {
   });
 }
 
-// -------- INPUTS DE PRODUTOS (ESTOQUE) --------
 async function renderProdutosEstoque() {
   let html = '';
   categorias.forEach(cat => {
@@ -84,7 +76,7 @@ async function renderProdutosEstoque() {
         <strong>${cat.nome}</strong>
         ${pontos.map(ponto => `
           <label>${ponto}:
-            <input type="number" min="0" step="1" id="qtd-${cat.nome}-${ponto}" placeholder="Quantidade">
+            <input type="number" min="0" step="1" id="qtd-${cat.nome}-${ponto}" placeholder="Qtd">
             <select id="un-${cat.nome}-${ponto}">
               <option value="unidade">Unidade</option>
               <option value="pacote">Pacote</option>
@@ -97,7 +89,6 @@ async function renderProdutosEstoque() {
     `;
   });
   document.getElementById('produtos-estoque').innerHTML = html;
-  // Mostra/oculta input extra
   categorias.forEach(cat => {
     pontos.forEach(ponto => {
       document.getElementById(`un-${cat.nome}-${ponto}`).onchange = (e) => {
@@ -108,7 +99,6 @@ async function renderProdutosEstoque() {
   });
 }
 
-// -------- SALVAR CATEGORIAS NO BANCO --------
 async function salvarCategorias() {
   const user = auth.currentUser;
   if (!user) return;
@@ -117,7 +107,6 @@ async function salvarCategorias() {
   });
 }
 
-// -------- CARREGAR CATEGORIAS DO BANCO --------
 async function carregarCategorias() {
   const user = auth.currentUser;
   if (!user) return;
@@ -127,7 +116,6 @@ async function carregarCategorias() {
   await renderProdutosEstoque();
 }
 
-// -------- SUBMIT DO FORMULÁRIO DE ESTOQUE --------
 document.getElementById('form-estoque').onsubmit = async (e) => {
   e.preventDefault();
   const data = document.getElementById('estoque-data').value;
@@ -162,53 +150,58 @@ document.getElementById('form-estoque').onsubmit = async (e) => {
   loadEstoque();
 };
 
-// -------- RESUMO DO ESTOQUE --------
 async function loadEstoque() {
   const user = auth.currentUser;
   if (!user) return;
   const snap = await db.collection('estoque')
     .where('uid', '==', user.uid)
     .orderBy('data', 'desc')
-    .limit(16).get();
+    .limit(30).get();
   const rows = [];
   snap.forEach(doc => rows.push(doc.data()));
-  // Soma por categoria e ponto
-  let resumo = {};
-  categorias.forEach(cat => {
-    resumo[cat.nome] = pontos.map(ponto => {
-      // Último registro daquele ponto/categoria
-      const estoquePonto = rows.find(r => r.produtos.some(prod => prod.categoria === cat.nome && prod.ponto === ponto));
-      if (!estoquePonto) return 0;
-      const prod = estoquePonto.produtos.find(prod => prod.categoria === cat.nome && prod.ponto === ponto);
-      let total = prod.quantidade;
-      if (prod.unidade === "pacote_unidade") total += prod.extra;
-      return total;
+
+  // Render cards
+  const list = document.getElementById('estoque-list');
+  list.innerHTML = rows.map(d => `
+    <div class="card">
+      <div class="card-title">${formatDate(d.data)}</div>
+      <div>
+        ${d.produtos.map(p => `
+          <div style="margin-bottom:4px;">
+            <span class="card-subtitle">${p.categoria} ${p.ponto}:</span>
+            <b>${p.quantidade + (p.unidade === "pacote_unidade" ? " + " + p.extra : "")}</b> ${p.unidade}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Render gráfico total por categoria/ponto (exemplo: quantidade total por data)
+  if (rows.length > 1 && categorias.length > 0) {
+    const labels = rows.map(r => r.data).reverse();
+    const datasets = categorias.map(cat => ({
+      label: cat.nome,
+      data: labels.map(date =>
+        rows.find(r => r.data === date)?.produtos
+          .filter(p => p.categoria === cat.nome)
+          .reduce((sum, p) => sum + p.quantidade + (p.unidade === "pacote_unidade" ? p.extra : 0), 0) || 0
+      ),
+      borderColor: '#' + Math.floor(Math.random()*16777215).toString(16), fill:false
+    }));
+    if (window.estoqueChart) window.estoqueChart.destroy();
+    window.estoqueChart = new Chart(document.getElementById('estoque-chart').getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        plugins: { legend: { labels: { color: document.body.classList.contains('dark') ? "#e3e3e3" : "#222" }}},
+        scales: { x: { ticks: { color: document.body.classList.contains('dark') ? "#e3e3e3" : "#222" } }, y: { ticks: { color: document.body.classList.contains('dark') ? "#e3e3e3" : "#222" } } }
+      }
     });
-  });
-  // Mostra resumo
-  let html = '<h3>Resumo Atual de Estoque (por ponto)</h3><table><tr><th>Categoria</th>';
-  pontos.forEach(p => html += `<th>${p}</th>`);
-  html += '</tr>';
-  categorias.forEach(cat => {
-    html += `<tr><td>${cat.nome}</td>`;
-    resumo[cat.nome].forEach(val => html += `<td>${val}</td>`);
-    html += '</tr>';
-  });
-  html += '</table>';
-  document.getElementById('estoque-resumo').innerHTML = html;
+  }
 }
 
-// -------- INICIALIZAÇÃO --------
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
   await carregarCategorias();
   await loadEstoque();
 });
-
-// -------- CSS MODAL --------
-const style = document.createElement('style');
-style.innerHTML = `
-  .modal { position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0006;display:flex;align-items:center;justify-content:center;z-index:9999; }
-  .modal-content { background:white;padding:2em;border-radius:8px;min-width:250px; }
-`;
-document.head.appendChild(style);
