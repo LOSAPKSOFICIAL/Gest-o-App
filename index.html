@@ -13,17 +13,20 @@
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body class="light">
+  <div id="login-modal"></div>
   <nav>
+    <div class="logo">💧⚡📦 GestãoApp</div>
     <ul>
       <li><button class="tab-btn active" data-tab="agua">Medição Água</button></li>
       <li><button class="tab-btn" data-tab="energia">Medição Energia</button></li>
       <li><button class="tab-btn" data-tab="estoque">Estoque</button></li>
       <li><button class="tab-btn" data-tab="relatorio">Relatórios</button></li>
     </ul>
-    <div class="theme-switcher">
+    <div class="side-actions">
       <button id="toggle-theme">🌙/☀️</button>
+      <span id="user-info"></span>
+      <button id="logout-btn" style="display:none;">Sair</button>
     </div>
-    <div id="user-info"></div>
   </nav>
   <main>
     <section id="agua" class="tab active"></section>
@@ -39,7 +42,6 @@
   <script src="stock.js"></script>
   <script src="report.js"></script>
   <script>
-    // Navegação de abas
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -48,11 +50,13 @@
         document.getElementById(btn.dataset.tab).classList.add('active');
       });
     });
-    // Troca de tema
     document.getElementById('toggle-theme').onclick = () => {
       document.body.classList.toggle('dark');
       document.body.classList.toggle('light');
     };
+    document.getElementById('logout-btn').onclick = () => {
+      auth.signOut();
+    }
   </script>
 </body>
 </html>
