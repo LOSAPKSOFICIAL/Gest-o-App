@@ -1,9 +1,13 @@
 :root {
   --bg-light: #f9f9f9;
-  --bg-dark: #1a1a1a;
+  --bg-dark: #181c23;
+  --card-dark: #23293a;
   --text-light: #222;
-  --text-dark: #f9f9f9;
+  --text-dark: #e3e3e3;
   --primary: #2196f3;
+  --accent: #44d3a6;
+  --danger: #e74c3c;
+  --radius: 12px;
 }
 body.light {
   background: var(--bg-light);
@@ -19,7 +23,13 @@ nav {
   align-items: center;
   background: var(--primary);
   color: white;
-  padding: 0.5em 1em;
+  padding: 0.7em 1em;
+  border-bottom: 2px solid var(--accent);
+}
+nav .logo {
+  font-weight: 700;
+  font-size: 1.3em;
+  letter-spacing: 1px;
 }
 nav ul {
   display: flex;
@@ -33,58 +43,130 @@ nav ul {
   color: inherit;
   border: none;
   font-size: 1.1em;
-  padding: 0.5em 1.2em;
+  padding: 0.6em 1.2em;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: border-bottom 0.2s;
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: 3px solid transparent;
+  transition: border-bottom 0.2s, background 0.2s;
 }
 .tab-btn.active {
-  border-bottom: 2px solid yellow;
+  background: #fff2;
+  border-bottom: 3px solid var(--accent);
 }
-.theme-switcher button {
-  font-size: 1.3em;
-  cursor: pointer;
-  background: none;
+.side-actions {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+#logout-btn {
+  background: var(--danger);
+  color: #fff;
   border: none;
-  color: inherit;
+  padding: 0.3em 1em;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-block;
 }
 main {
-  padding: 1.5em;
+  padding: 2em 1em;
   max-width: 900px;
   margin: auto;
 }
 .tab { display: none; }
 .tab.active { display: block; }
 
-@media (max-width: 600px) {
-  nav ul { flex-direction: column; gap: 0.5em; }
-  main { padding: 0.5em; }
+.card-list {
+  margin: 1em 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
 }
-input, select, button {
+.card {
+  background: var(--card-dark);
+  color: var(--text-dark);
+  border-radius: var(--radius);
+  padding: 1em;
+  min-width: 230px;
+  box-shadow: 0 2px 10px #0004;
+  margin-bottom: 1em;
+}
+.card .card-title {
+  font-weight: bold;
+  font-size: 1.13em;
+  margin-bottom: 0.3em;
+}
+.card .card-subtitle { font-size: 0.95em; color: var(--accent);}
+.card .card-actions { margin-top: 0.7em; }
+.card .delete-btn {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.2em 0.7em;
+  cursor: pointer;
+}
+
+input, select, button, textarea {
   font-size: 1em;
   padding: 0.5em;
   margin: 0.3em 0;
-  border-radius: 4px;
+  border-radius: 6px;
   border: 1px solid #aaa;
+  background: #fff;
+}
+body.dark input, body.dark select, body.dark textarea {
+  background: #23293a;
+  color: #e3e3e3;
+  border: 1px solid #444;
 }
 form {
   margin-bottom: 2em;
+  background: var(--card-dark);
+  padding: 1em;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px #0003;
 }
-.login-screen {
-  max-width: 350px;
-  margin: 2em auto;
-  padding: 2em;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px #0001;
+.login-modal-bg {
+  position:fixed;
+  top:0;left:0;width:100vw;height:100vh;
+  background:#181c23d6;
+  display:flex;align-items:center;justify-content:center;z-index:9999;
 }
-table {
-  border-collapse: collapse;
+.login-card {
+  background: var(--card-dark);
+  color: var(--text-dark);
+  padding: 2em 2em;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 24px #0005;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: center;
+}
+.login-card h2 {
+  font-size:2em;
+  font-weight:700;
+  margin-bottom:.6em;
+  letter-spacing:1px;
+}
+.login-card input {
   width: 100%;
-  margin: 1em 0;
 }
-th, td {
-  border: 1px solid #bbb;
-  padding: 0.5em;
-  text-align: center;
+.login-card button {
+  width: 100%;
+  font-size:1.2em;
+  background: var(--accent);
+  color: #fff;
+  border:none;
+  border-radius: var(--radius);
+  padding: 0.7em 0;
+  font-weight: bold;
+}
+@media (max-width: 600px) {
+  nav ul { flex-direction: column; gap: 0.5em; }
+  main { padding: 0.5em; }
+  .card-list { flex-direction: column; }
+  .login-card { min-width: 90vw; }
 }
