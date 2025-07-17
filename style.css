@@ -1,172 +1,332 @@
+/* Definindo variáveis para um tema consistente e fácil de manter */
 :root {
-  --bg-light: #f9f9f9;
-  --bg-dark: #181c23;
-  --card-dark: #23293a;
-  --text-light: #222;
-  --text-dark: #e3e3e3;
-  --primary: #2196f3;
-  --accent: #44d3a6;
-  --danger: #e74c3c;
+  --bg-light: #f9fafb;
+  --bg-dark: #1f2937;
+  --card-dark: #374151;
+  --text-light: #1f2a44;
+  --text-dark: #e5e7eb;
+  --primary: #3b82f6;
+  --accent: #34d399;
+  --danger: #ef4444;
   --radius: 12px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --transition: all 0.3s ease;
 }
+
+/* Reset básico para consistência */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif; /* Fonte moderna e limpa */
+}
+
 body.light {
   background: var(--bg-light);
   color: var(--text-light);
 }
+
 body.dark {
   background: var(--bg-dark);
   color: var(--text-dark);
 }
+
+/* Estilizando a navegação */
 nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: var(--primary);
-  color: white;
-  padding: 0.7em 1em;
-  border-bottom: 2px solid var(--accent);
+  color: #ffffff;
+  padding: 1rem 2rem;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
+
 nav .logo {
-  font-weight: 700;
-  font-size: 1.3em;
-  letter-spacing: 1px;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
+
 nav ul {
   display: flex;
-  gap: 1em;
+  gap: 1.5rem;
   list-style: none;
-  padding: 0;
-  margin: 0;
 }
+
 .tab-btn {
   background: none;
-  color: inherit;
+  color: #ffffff;
   border: none;
-  font-size: 1.1em;
-  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  padding: 0.8rem 1.5rem;
   cursor: pointer;
   border-radius: var(--radius) var(--radius) 0 0;
-  border-bottom: 3px solid transparent;
-  transition: border-bottom 0.2s, background 0.2s;
+  transition: var(--transition);
+  position: relative;
 }
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .tab-btn.active {
-  background: #fff2;
-  border-bottom: 3px solid var(--accent);
+  background: rgba(255, 255, 255, 0.15);
+  border-bottom: 4px solid var(--accent);
 }
+
 .side-actions {
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: 1rem;
 }
+
 #logout-btn {
   background: var(--danger);
-  color: #fff;
+  color: #ffffff;
   border: none;
-  padding: 0.3em 1em;
+  padding: 0.5rem 1.5rem;
   border-radius: var(--radius);
   cursor: pointer;
-  font-weight: bold;
-  display: inline-block;
+  font-weight: 600;
+  transition: var(--transition);
 }
-main {
-  padding: 2em 1em;
-  max-width: 900px;
-  margin: auto;
-}
-.tab { display: none; }
-.tab.active { display: block; }
 
-.card-list {
-  margin: 1em 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
+#logout-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
+
+/* Estilizando o conteúdo principal */
+main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+  min-height: calc(100vh - 80px); /* Ajusta altura para ocupar tela */
+}
+
+/* Tabs */
+.tab {
+  display: none;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.tab.active {
+  display: block;
+}
+
+/* Animação de fade para tabs */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilizando os cards */
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
 .card {
   background: var(--card-dark);
   color: var(--text-dark);
   border-radius: var(--radius);
-  padding: 1em;
-  min-width: 230px;
-  box-shadow: 0 2px 10px #0004;
-  margin-bottom: 1em;
-}
-.card .card-title {
-  font-weight: bold;
-  font-size: 1.13em;
-  margin-bottom: 0.3em;
-}
-.card .card-subtitle { font-size: 0.95em; color: var(--accent);}
-.card .card-actions { margin-top: 0.7em; }
-.card .delete-btn {
-  background: var(--danger);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.2em 0.7em;
-  cursor: pointer;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-dark);
+  transition: var(--transition);
 }
 
-input, select, button, textarea {
-  font-size: 1em;
-  padding: 0.5em;
-  margin: 0.3em 0;
+body.light .card {
+  background: #ffffff;
+  color: var(--text-light);
+  box-shadow: var(--shadow);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card .card-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.card .card-subtitle {
+  font-size: 0.95rem;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.card .card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.card .delete-btn {
+  background: var(--danger);
+  color: #ffffff;
+  border: none;
   border-radius: 6px;
-  border: 1px solid #aaa;
-  background: #fff;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
 }
-body.dark input, body.dark select, body.dark textarea {
-  background: #23293a;
-  color: #e3e3e3;
-  border: 1px solid #444;
+
+.card .delete-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
+
+/* Estilizando formulários */
 form {
-  margin-bottom: 2em;
   background: var(--card-dark);
-  padding: 1em;
+  padding: 2rem;
   border-radius: var(--radius);
-  box-shadow: 0 2px 8px #0003;
+  box-shadow: var(--shadow-dark);
+  margin-bottom: 2rem;
 }
+
+body.light form {
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+input, select, textarea {
+  font-size: 1rem;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  width: 100%;
+  transition: var(--transition);
+}
+
+body.dark input, body.dark select, body.dark textarea {
+  background: #374151;
+  color: var(--text-dark);
+  border: 1px solid #4b5563;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Estilizando o modal de login */
 .login-modal-bg {
-  position:fixed;
-  top:0;left:0;width:100vw;height:100vh;
-  background:#181c23d6;
-  display:flex;align-items:center;justify-content:center;z-index:9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(31, 41, 55, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
 }
+
 .login-card {
   background: var(--card-dark);
   color: var(--text-dark);
-  padding: 2em 2em;
+  padding: 2.5rem;
   border-radius: var(--radius);
-  box-shadow: 0 4px 24px #0005;
-  min-width: 320px;
+  box-shadow: var(--shadow-dark);
+  min-width: 360px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 1.5rem;
   align-items: center;
 }
-.login-card h2 {
-  font-size:2em;
-  font-weight:700;
-  margin-bottom:.6em;
-  letter-spacing:1px;
+
+body.light .login-card {
+  background: #ffffff;
+  box-shadow: var(--shadow);
 }
+
+.login-card h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
 .login-card input {
   width: 100%;
 }
+
 .login-card button {
   width: 100%;
-  font-size:1.2em;
+  font-size: 1.1rem;
   background: var(--accent);
-  color: #fff;
-  border:none;
+  color: #ffffff;
+  border: none;
   border-radius: var(--radius);
-  padding: 0.7em 0;
-  font-weight: bold;
+  padding: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
 }
-@media (max-width: 600px) {
-  nav ul { flex-direction: column; gap: 0.5em; }
-  main { padding: 0.5em; }
-  .card-list { flex-direction: column; }
-  .login-card { min-width: 90vw; }
+
+.login-card button:hover {
+  background: #10b981;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  nav ul {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .tab-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  .login-card {
+    min-width: 90vw;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-list {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card {
+    padding: 1rem;
+  }
+
+  .login-card h2 {
+    font-size: 1.5rem;
+  }
 }
