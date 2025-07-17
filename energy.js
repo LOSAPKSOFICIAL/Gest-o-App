@@ -1,14 +1,13 @@
-// Lógica da Medição de Energia (um ponto por data)
 const energiaSection = document.getElementById('energia');
 energiaSection.innerHTML = `
-  <h2>Medição de Energia</h2>
+  <h2>⚡ Medição de Energia</h2>
   <form id="form-energia">
-    <label>Data: <input type="date" id="energia-data" required value="${formatDate(new Date())}"></label><br>
-    <label>Consumo (kWh): <input type="number" id="energia-valor" step="0.01" min="0" required></label><br>
+    <label>Data: <input type="date" id="energia-data" required value="${formatDate(new Date())}"></label>
+    <label>Consumo (kWh): <input type="number" id="energia-valor" step="0.01" min="0" required></label>
     <button type="submit">Salvar Medição</button>
   </form>
-  <div id="energia-list"></div>
-  <canvas id="energia-chart" height="100"></canvas>
+  <div id="energia-list" class="card-list"></div>
+  <canvas id="energia-chart" height="120"></canvas>
 `;
 
 document.getElementById('form-energia').onsubmit = async (e) => {
@@ -33,30 +32,36 @@ async function loadEnergia() {
     .where('uid', '==', user.uid)
     .orderBy('data', 'desc')
     .limit(30).get();
-  const list = document.getElementById('energia-list');
-  let html = '<h3>Últimas medições</h3><ul>';
   const rows = [];
-  snap.forEach(doc => {
-    const d = doc.data();
-    rows.push(d);
-    html += `<li>${d.data}: ${d.valor} kWh</li>`;
-  });
-  html += '</ul>';
-  list.innerHTML = html;
-  drawEnergiaChart(rows.reverse());
-}
-async function drawEnergiaChart(rows) {
-  if (!window.Chart) return;
-  const ctx = document.getElementById('energia-chart').getContext('2d');
-  if (window.energiaChart) window.energiaChart.destroy();
-  window.energiaChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: rows.map(r => r.data),
-      datasets: [
-        { label: 'Energia', data: rows.map(r => r.valor), borderColor: 'orange', fill: false }
-      ]
-    }
-  });
+  snap.forEach(doc => rows.push(doc.data()));
+
+  // Render cards
+  const list = document.getElementById('energia-list');
+  list.innerHTML = rows.map(d => `
+    <div class="card">
+      <div class="card-title">${formatDate(d.data)}</div>
+      <div class="card-subtitle">Consumo: <b>${d.valor} kWh</b></div>
+    </div>
+  `).join('');
+
+  // Render gráfico se houver diferença de datas
+  if (rows.length > 1) {
+    const labels = rows.map(r => r.data).reverse();
+    const dataV = rows.map(r => r.valor).reverse();
+    if (window.energiaChart) window.energiaChart.destroy();
+    window.energiaChart = new Chart(document.getElementById('energia-chart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Energia', data: dataV, borderColor: '#e74c3c', fill: false }
+        ]
+      },
+      options: {
+        plugins: { legend: { labels: { color: document.body.classList.contains('dark') ? "#e3e3e3" : "#222" }}},
+        scales: { x: { ticks: { color: document.body.classList.contains('dark') ? "#e3e3e3" : "#222" } }, y: { ticks: { color: document.body.classList.contains('dark') ? "#e3e3e3" : "#222" } } }
+      }
+    });
+  }
 }
 auth.onAuthStateChanged(loadEnergia);
