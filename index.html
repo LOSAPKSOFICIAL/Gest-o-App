@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Gestão de Consumos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Bibliotecas externas -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body class="light">
+  <nav>
+    <ul>
+      <li><button class="tab-btn active" data-tab="agua">Medição Água</button></li>
+      <li><button class="tab-btn" data-tab="energia">Medição Energia</button></li>
+      <li><button class="tab-btn" data-tab="estoque">Estoque</button></li>
+      <li><button class="tab-btn" data-tab="relatorio">Relatórios</button></li>
+    </ul>
+    <div class="theme-switcher">
+      <button id="toggle-theme">🌙/☀️</button>
+    </div>
+    <div id="user-info"></div>
+  </nav>
+  <main>
+    <section id="agua" class="tab active"></section>
+    <section id="energia" class="tab"></section>
+    <section id="estoque" class="tab"></section>
+    <section id="relatorio" class="tab"></section>
+  </main>
+  <script src="firebase.js"></script>
+  <script src="utils.js"></script>
+  <script src="auth.js"></script>
+  <script src="water.js"></script>
+  <script src="energy.js"></script>
+  <script src="stock.js"></script>
+  <script src="report.js"></script>
+  <script>
+    // Navegação de abas
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+    // Troca de tema
+    document.getElementById('toggle-theme').onclick = () => {
+      document.body.classList.toggle('dark');
+      document.body.classList.toggle('light');
+    };
+  </script>
+</body>
+</html>
