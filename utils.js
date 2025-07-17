@@ -1,4 +1,3 @@
-// Funções auxiliares
 function formatDate(date) {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
