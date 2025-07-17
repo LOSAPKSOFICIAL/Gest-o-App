@@ -1,15 +1,13 @@
-// Relatórios e exportação XLSX (requer SheetJS)
 const relatorioSection = document.getElementById('relatorio');
 relatorioSection.innerHTML = `
-  <h2>Relatórios</h2>
-  <button onclick="gerarRelatorioXLSX()">Gerar XLSX (últimos 6 meses)</button>
+  <h2>📊 Relatórios</h2>
+  <button onclick="gerarRelatorioXLSX()" class="accent-btn">Gerar XLSX (últimos 6 meses)</button>
   <div id="rel-resultado"></div>
 `;
 
 async function gerarRelatorioXLSX() {
   const user = auth.currentUser;
   if (!user) return alert("Faça login!");
-  // Exemplo: pega todas as medições de água dos últimos 6 meses
   const since = new Date();
   since.setMonth(since.getMonth() - 6);
   const snap = await db.collection('agua')
@@ -21,7 +19,6 @@ async function gerarRelatorioXLSX() {
     const d = doc.data();
     dados.push({ data: d.data, 'Ponto A': d.pontos.A, 'Ponto B': d.pontos.B });
   });
-  // Gera XLSX
   if (dados.length === 0) return alert("Sem dados!");
   const ws = XLSX.utils.json_to_sheet(dados);
   const wb = XLSX.utils.book_new();
