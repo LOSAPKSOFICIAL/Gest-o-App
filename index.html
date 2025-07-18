@@ -4,47 +4,81 @@
   <meta charset="UTF-8">
   <title>Sistema de Gestão de Consumos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4a6fa5">
+  <meta http-equiv="Cache-Control" content="no-cache">
   <link rel="stylesheet" href="style.css">
-  <!-- Import da fonte Inter -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
-  <!-- Import do SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <!-- Bibliotecas externas -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" defer></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js" defer></script>
 </head>
 <body class="light">
-  <div id="login-modal"></div>
-  <nav>
-    <div class="logo">💧⚡📦 GestãoApp</div>
-    <ul>
-      <li><button class="tab-btn active" data-tab="agua">Medição Água</button></li>
-      <li><button class="tab-btn" data-tab="energia">Medição Energia</button></li>
-      <li><button class="tab-btn" data-tab="estoque">Estoque</button></li>
-      <li><button class="tab-btn" data-tab="relatorio">Relatórios</button></li>
-    </ul>
-    <div class="side-actions">
-      <button id="toggle-theme">🌙/☀️</button>
-      <span id="user-info"></span>
-      <button id="logout-btn" style="display:none;">Sair</button>
-    </div>
-  </nav>
+  <header>
+    <nav>
+      <div class="logo">💧⚡📦 GestãoApp</div>
+      <ul>
+        <li><button class="tab-btn active" data-tab="agua">Medição Água</button></li>
+        <li><button class="tab-btn" data-tab="energia">Medição Energia</button></li>
+        <li><button class="tab-btn" data-tab="estoque">Estoque</button></li>
+        <li><button class="tab-btn" data-tab="relatorio">Relatórios</button></li>
+      </ul>
+      <div class="side-actions">
+        <button id="toggle-theme" aria-label="Alternar tema">🌙/☀️</button>
+        <span id="user-info"></span>
+        <button id="logout-btn" style="display:none;">Sair</button>
+      </div>
+    </nav>
+  </header>
   <main>
-    <section id="agua" class="tab active"></section>
-    <section id="energia" class="tab"></section>
-    <section id="estoque" class="tab"></section>
-    <section id="relatorio" class="tab"></section>
+    <section id="agua" class="tab active">
+      <h2>💧 Medição de Água</h2>
+      <form id="form-agua" class="measure-form">
+        <label>Data: <input type="date" id="agua-data" required></label>
+        <label>Ponto A (m³): <input type="number" id="agua-a" step="0.01" min="0" required></label>
+        <label>Ponto B (m³): <input type="number" id="agua-b" step="0.01" min="0" required></label>
+        <button type="submit">Salvar</button>
+      </form>
+      <div id="agua-list" class="card-list"></div>
+      <div class="chart-container"><canvas id="agua-chart"></canvas></div>
+    </section>
+    <section id="energia" class="tab">
+      <h2>⚡ Medição de Energia</h2>
+      <form id="form-energia" class="measure-form">
+        <label>Data: <input type="date" id="energia-data" required></label>
+        <label>Consumo (kWh): <input type="number" id="energia-valor" step="0.01" min="0" required></label>
+        <button type="submit">Salvar</button>
+      </form>
+      <div id="energia-list" class="card-list"></div>
+      <div class="chart-container"><canvas id="energia-chart"></canvas></div>
+    </section>
+    <section id="estoque" class="tab">
+      <h2>📦 Gerenciamento de Estoque</h2>
+      <form id="form-estoque" class="measure-form">
+        <label>Data: <input type="date" id="estoque-data" required></label>
+        <label>Quantidade: <input type="number" id="estoque-quantidade" step="1" min="0" required></label>
+        <button type="submit">Salvar</button>
+      </form>
+      <div id="estoque-list" class="card-list"></div>
+      <div class="chart-container"><canvas id="estoque-chart"></canvas></div>
+    </section>
+    <section id="relatorio" class="tab">
+      <h2>📊 Relatórios</h2>
+      <button id="export-report" class="action-btn">Gerar Relatório Geral</button>
+    </section>
   </main>
-  <script src="firebase.js"></script>
-  <script src="utils.js"></script>
-  <script src="auth.js"></script>
-  <script src="water.js"></script>
-  <script src="energy.js"></script>
-  <script src="stock.js"></script>
-  <script src="report.js"></script>
+  <footer>
+    <p>&copy; 2025 GestãoApp - Todos os direitos reservados</p>
+  </footer>
+  <script src="firebase.js" defer></script>
+  <script src="utils.js" defer></script>
+  <script src="auth.js" defer></script>
+  <script src="water.js" defer></script>
+  <script src="energy.js" defer></script>
+  <script src="stock.js" defer></script>
+  <script src="report.js" defer></script>
   <script>
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -57,9 +91,13 @@
     document.getElementById('toggle-theme').onclick = () => {
       document.body.classList.toggle('dark');
       document.body.classList.toggle('light');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     };
-    document.getElementById('logout-btn').onclick = () => {
-      auth.signOut();
+    document.getElementById('logout-btn').onclick = () => auth.signOut();
+    // Carrega tema salvo
+    if (localStorage.getItem('theme')) {
+      document.body.classList.add(localStorage.getItem('theme'));
+      document.body.classList.remove(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
     }
   </script>
 </body>
