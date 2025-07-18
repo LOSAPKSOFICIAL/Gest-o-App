@@ -1,4 +1,10 @@
 // auth.js
+function formatDate(date) {
+  if (!date) return '';
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toISOString().substring(0, 10);
+}
+
 function showLogin() {
   document.getElementById('login-modal').innerHTML = `
     <div class="login-modal-bg">
@@ -20,32 +26,25 @@ function doLogin() {
   const loginBtn = document.getElementById('login-btn');
   const errorDiv = document.getElementById('login-err');
 
-  // Validação básica no front-end
   if (!email || !pass) {
     errorDiv.textContent = 'Por favor, preencha email e senha.';
     return;
   }
 
-  // Mostra o alerta de carregamento
   Swal.fire({
     title: 'Carregando...',
     text: 'Buscando informações, aguarde.',
     allowOutsideClick: false,
     allowEscapeKey: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
+    didOpen: () => Swal.showLoading()
   });
 
-  // Desativa o botão durante o login
   loginBtn.disabled = true;
   loginBtn.textContent = 'Entrando...';
 
   auth.signInWithEmailAndPassword(email, pass)
     .then(() => {
-      // Fecha o alerta de carregamento
       Swal.close();
-      // Opcional: Mostra alerta de sucesso
       Swal.fire({
         icon: 'success',
         title: 'Login bem-sucedido!',
@@ -56,36 +55,23 @@ function doLogin() {
       errorDiv.textContent = '';
     })
     .catch(error => {
-      // Fecha o alerta de carregamento
       Swal.close();
-      // Traduz e exibe mensagens de erro amigáveis
       let errorMessage;
       switch (error.code) {
-        case 'auth/invalid-email':
-          errorMessage = 'Email inválido. Verifique o formato.';
-          break;
-        case 'auth/user-not-found':
-          errorMessage = 'Usuário não encontrado.';
-          break;
-        case 'auth/wrong-password':
-          errorMessage = 'Senha incorreta.';
-          break;
-        case 'auth/too-many-requests':
-          errorMessage = 'Muitas tentativas. Tente novamente mais tarde.';
-          break;
-        default:
-          errorMessage = 'Erro ao fazer login: ' + error.message;
+        case 'auth/invalid-email': errorMessage = 'Email inválido. Verifique o formato.'; break;
+        case 'auth/user-not-found': errorMessage = 'Usuário não encontrado.'; break;
+        case 'auth/wrong-password': errorMessage = 'Senha incorreta.'; break;
+        case 'auth/too-many-requests': errorMessage = 'Muitas tentativas. Tente novamente mais tarde.'; break;
+        default: errorMessage = 'Erro ao fazer login: ' + error.message;
       }
       errorDiv.textContent = errorMessage;
     })
     .finally(() => {
-      // Reativa o botão
       loginBtn.disabled = false;
       loginBtn.textContent = 'Entrar';
     });
 }
 
-// Monitora mudanças no estado de autenticação
 auth.onAuthStateChanged(user => {
   if (!user) {
     showLogin();
