@@ -1,28 +1,28 @@
-const relatorioSection = document.getElementById('relatorio');
-relatorioSection.innerHTML = `
-  <h2>📊 Relatórios</h2>
-  <button onclick="gerarRelatorioXLSX()" class="accent-btn">Gerar XLSX (últimos 6 meses)</button>
-  <div id="rel-resultado"></div>
-`;
-
-async function gerarRelatorioXLSX() {
+// report.js
+document.getElementById('export-report').onclick = async () => {
   const user = auth.currentUser;
-  if (!user) return alert("Faça login!");
-  const since = new Date();
-  since.setMonth(since.getMonth() - 6);
-  const snap = await db.collection('agua')
-    .where('uid', '==', user.uid)
-    .where('data', '>=', formatDate(since))
-    .orderBy('data').get();
-  const dados = [];
-  snap.forEach(doc => {
-    const d = doc.data();
-    dados.push({ data: d.data, 'Ponto A': d.pontos.A, 'Ponto B': d.pontos.B });
-  });
-  if (dados.length === 0) return alert("Sem dados!");
-  const ws = XLSX.utils.json_to_sheet(dados);
+  if (!user) return Swal.fire('Erro', 'Faça login!', 'error');
+  Swal.fire({ title: 'Gerando...', text: 'Aguarde...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  const [agua, energia, estoque] = await Promise.all([
+    db.collection('agua').where('uid', '==', user.uid).get(),
+    db.collection('energia').where('uid', '==', user.uid).get(),
+    db.collection('estoque').where('uid', '==', user.uid).get()
+  ]);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Medição Água");
-  XLSX.writeFile(wb, "relatorio_agua.xlsx");
-  document.getElementById('rel-resultado').textContent = "Relatório gerado!";
-}
+  const data = [
+    ['Relatório Geral - GestãoApp', '', '', `Data: ${new Date().toLocaleString('pt-BR')}`],
+    [],
+    ['Água'],
+    ...agua.docs.map(d => [d.data().data, d.data().pontos.A, d.data().pontos.B]),
+    [],
+    ['Energia'],
+    ...energia.docs.map(d => [d.data().data, d.data().valor]),
+    [],
+    ['Estoque'],
+    ...estoque.docs.map(d => [d.data().data, d.data().quantidade])
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, 'Relatorio_Geral');
+  XLSX.writeFile(wb, `relatorio_geral_${new Date().toISOString().split('T')[0]}.xlsx`);
+  Swal.fire('Sucesso', 'Relatório gerado!', 'success');
+};
