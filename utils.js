@@ -1,7 +1,5 @@
 function formatDate(date) {
-  if (!date) return '';
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toISOString().substring(0, 10);
+  return date.toISOString().split('T')[0];
 }
 function getCurrentMonday() {
   const d = new Date();
